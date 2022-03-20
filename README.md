@@ -1,15 +1,5 @@
-# Basic Sample Hardhat Project
+# Staking Project
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+contract address: https://mumbai.polygonscan.com/address/0xE74F376cD729fAbafeEbd254482765901F393982#code
 
-Try running some of the following tasks:
-
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-```
+UI - https://oneclickdapp.com/jackson-forbid
