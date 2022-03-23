@@ -10,14 +10,12 @@ contract Biggytoken is ERC20, Ownable {
     mapping(address => uint256) internal stakes;
     mapping(address => uint256) internal rewards;
     uint256 public tokenPricePerEther;
-    uint256 public stakingDuration;
     mapping(address => uint256) internal stakingStartTime;
     uint256 public tokensPerEth;
 
     constructor() ERC20("Biggytoken", "BGT") {
         _mint(msg.sender, _initial_supply);
         tokensPerEth = 1000;
-        stakingDuration = 7 days;
     }
 
     function isStakeholder(address _address)
@@ -31,7 +29,7 @@ contract Biggytoken is ERC20, Ownable {
         return (false, 0);
     }
 
-    function addStakeholder(address _stakeholder) public onlyOwner {
+    function addStakeholder(address _stakeholder) public {
         (bool _isStakeholder, ) = isStakeholder(_stakeholder);
         if (!_isStakeholder) stakeholders.push(_stakeholder);
     }
@@ -68,15 +66,9 @@ contract Biggytoken is ERC20, Ownable {
     modifier UptoAWeek() {
         require(
             block.timestamp > stakingStartTime[msg.sender] + 7 days,
-            "Not upto 1 week yet"
+            "Not upto a week yet"
         );
         _;
-    }
-
-    function removeStake(uint256 _stake) public {
-        stakes[msg.sender] -= _stake;
-        if (stakes[msg.sender] == 0) removeStakeholder(msg.sender);
-        _mint(msg.sender, _stake);
     }
 
     function rewardOf(address _stakeholder) public view returns (uint256) {
@@ -102,6 +94,10 @@ contract Biggytoken is ERC20, Ownable {
     function claimRewards() public UptoAWeek {
         uint256 reward = calculateReward(msg.sender);
         rewards[msg.sender] += reward;
+
+        if(block.timestamp > stakingStartTime[msg.sender] +14 days){
+            rewards[msg.sender]=0;
+        }
     }
 
     function distributeRewards() public onlyOwner {
@@ -112,10 +108,12 @@ contract Biggytoken is ERC20, Ownable {
         }
     }
 
-    function withdrawReward() public {
+    function withdrawReward() public UptoAWeek {
         uint256 reward = rewards[msg.sender];
+        uint256 _stake = stakes[msg.sender];
         rewards[msg.sender] = 0;
-        _mint(msg.sender, reward);
+        stakes[msg.sender] = 0;
+        _mint(msg.sender, (reward + _stake));
     }
 
     function buytoken(address receiver) public payable {
